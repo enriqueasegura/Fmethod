@@ -1,7 +1,7 @@
 # Fmethod: The FACET-II Beam Stabilization Algorithm
 This is a beam stabilization algorithm implemented to mitigate the effects of slow drift on the FACET-II laser transport. 
 
-We have accomplished this by simulating the FACET-II beamline using ZEMAX, https://en.wikipedia.org/wiki/Zemax, testing a first-principle model of laser transport using https://books.google.com/books/about/Lasers.html?id=1BZVwUZLTkAC 
+We have accomplished this by simulating the FACET-II beamline using ZEMAX, https://en.wikipedia.org/wiki/Zemax, testing a first-principle model of laser transport using Lasers by Siegman.
 
 https://www.osapublishing.org/books/bookshelf/lasers.cfm. 
 
@@ -20,6 +20,7 @@ Currently working on:
 1. Improving tuning parameters. 
 2. Improving code's efficiency with respect to noise present in experiment. 
 3. Adding safeguards to enhance the robustness of the algorithm. 
+4. Implementing this algorithm on the FACET-II beamline to test its effectiveness on the intended experimental setup.
 
 For Simulations, we relied on ZEMAX's python API libraries, and MATLAB to design, implement, and optimize the controller. 
 
