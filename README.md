@@ -44,7 +44,6 @@ http://www.slac.stanford.edu/grp/lcls/controls/systems/xray_transport/
 
 Still on the list before end of fellowship: 
 
-Working on developing a machine learning technique to test auto-tuning features on Fmethod.
 
 
 
