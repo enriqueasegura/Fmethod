@@ -1,28 +1,48 @@
 # Fmethod: The FACET-II Beam Stabilization Algorithm
+
 This is a beam stabilization algorithm implemented to mitigate the effects of slow drift on the FACET-II laser transport. 
 
-We have accomplished this by simulating the FACET-II beamline using ZEMAX, https://en.wikipedia.org/wiki/Zemax, testing a first-principle model of laser transport using Lasers by Siegman.
+https://facet.slac.stanford.edu
+
+We have accomplished this by simulating the FACET-II beamline using ZEMAX, https://en.wikipedia.org/wiki/Zemax, testing a first-principle model of laser transport implemented using Lasers by Siegman as well as numerous research papers on Ray Tracing Optics.
 
 https://www.osapublishing.org/books/bookshelf/lasers.cfm. 
 
-From that simulation results, we have built a two-mirror-two-camera system to test the effectiveness of this method. 
+For Simulations, we relied on ZEMAX's python API libraries, and MATLAB to design, implement, and optimize the controller. 
 
-Here's the resulting code. This code is a PID-controller using that method - a 12x12 matrix for the final system, a 4x4 for this current system. 
+From the simulation results, we have built a two-mirror-two-camera system to test the effectiveness of this method. Here's the resulting code. This code is a PID-controller using that method - a 12x12 matrix for the final system, a 4x4 for this current system. 
 
-This controller was implemented using SLAC's code base http://www.slac.stanford.edu/grp/lcls/controls/systems/xray_transport/EPICS%20Manuals/Motor%20Record.pdf to interact and control cameras and pico-motors present on the transport.
+An introduction to the fundamentals of a PID controller: 
 
-A more complete documentation can be found here: 
+https://en.wikipedia.org/wiki/PID_controller#Integral_term
 
+# A more complete documentation can be found here: 
+
+The bread and butter of experimental physics software at SLAC: https://en.wikipedia.org/wiki/EPICS
+A Python library to get started with the nuts and bolts of EPICS: 
+
+https://www.slac.stanford.edu/grp/ssrl/spear/epics/extensions/pyepics/pyepics.pdf
+
+MATLAB Programmer’s Guide for FACET physicists: 
+
+https://portal.slac.stanford.edu/sites/ard_public/facet/faq/Documents/programming_guide_matlab_facet.pdf 
+
+This controller was implemented using SLAC's code base to interact and control cameras and pico-motors present on the transport: 
+
+http://www.slac.stanford.edu/grp/lcls/controls/systems/xray_transport/EPICS%20Manuals/Motor%20Record.pdf
 http://www.slac.stanford.edu/grp/lcls/controls/systems/xray_transport/
 
-Currently working on: 
+# Currently working on: 
 
 1. Improving tuning parameters. 
 2. Improving code's efficiency with respect to noise present in experiment. 
 3. Adding safeguards to enhance the robustness of the algorithm. 
 4. Implementing this algorithm on the FACET-II beamline to test its effectiveness on the intended experimental setup.
 
-For Simulations, we relied on ZEMAX's python API libraries, and MATLAB to design, implement, and optimize the controller. 
+Still on the list before end of fellowship: 
+
+Working on developing a machine learning technique to test auto-tuning features on Fmethod.
+
 
 
 

@@ -1,5 +1,5 @@
 function [variables, track_data, pv_data, corr_data, int_data, total_rev, int_diff, time_arr, aligntime]=facet_align(target, kp, ki, k_d, k_u, it_fterm)
-disp('kp, ki, ku:')
+disp('kp, ki, kd, ku:')
 ki = ki*k_u;
 kp= kp*k_u;
 kd = k_d*k_u
