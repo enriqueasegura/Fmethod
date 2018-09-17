@@ -30,8 +30,7 @@ https://portal.slac.stanford.edu/sites/ard_public/facet/faq/Documents/programmin
 This controller was implemented using SLAC's code base to interact and control cameras and pico-motors present on the transport: 
 
 http://www.slac.stanford.edu/grp/lcls/controls/systems/xray_transport/EPICS%20Manuals/Motor%20Record.pdf
-
-Pico-motor relevant manual: http://www.slac.stanford.edu/grp/lcls/controls/systems/xray_transport/
+http://www.slac.stanford.edu/grp/lcls/controls/systems/xray_transport/
 
 # Currently working on: 
 
