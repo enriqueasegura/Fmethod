@@ -15,7 +15,12 @@ This controller was implemented using SLAC's code base http://www.slac.stanford.
 
 A more complete documentation can be found here: 
 
-http://www.slac.stanford.edu/grp/lcls/controls/systems/xray_transport/
+The bread and butter of experimental physics software at SLAC: https://en.wikipedia.org/wiki/EPICS
+A Python library to get started with the nuts and bolts of EPICS: https://www.slac.stanford.edu/grp/ssrl/spear/epics/extensions/pyepics/pyepics.pdf
+
+MATLAB Programmer’s Guide for FACET physicists: https://portal.slac.stanford.edu/sites/ard_public/facet/faq/Documents/programming_guide_matlab_facet.pdf 
+
+Pico-motor relevant manual: http://www.slac.stanford.edu/grp/lcls/controls/systems/xray_transport/
 
 Currently working on: 
 
