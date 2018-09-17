@@ -2,6 +2,8 @@
 
 This is a beam stabilization algorithm implemented to mitigate the effects of slow drift on the FACET-II laser transport. 
 
+https://facet.slac.stanford.edu
+
 We have accomplished this by simulating the FACET-II beamline using ZEMAX, https://en.wikipedia.org/wiki/Zemax, testing a first-principle model of laser transport using Lasers by Siegman.
 
 https://www.osapublishing.org/books/bookshelf/lasers.cfm. 
