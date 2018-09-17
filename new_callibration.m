@@ -1,3 +1,30 @@
+%This function measures the experimental
+%laser transport matrix used to determine
+%the appropiate corrections to effectively move
+%a misaligned beam to its target position. 
+%The system we are working on rely on pico-motors which
+%are prone tho latch back (hysteresis). 
+%Thus, we measured this matrix by deliberating target the center
+%More about hysteresis can be found here:
+%https://en.wikipedia.org/wiki/Hysteresis
+%In our system the Y-direction in the cameras are flipped
+%which is why for the X-direction we are measuring the positive 
+%direction from left to right (positive x vector)
+%but in Y-direction we measure it as the standard positive y vector. 
+%Hence, why the measurements in Y-direction are negative. 
+%This matrix has been tested against the experimental model
+%and has a 1:1 relation between theory and experiment on its
+%diagonal entries.
+
+%arguments returned:
+%cm: the callibration matrix
+%hm: measuring the difference at the end of each set of motions 
+
+%Something to keep in mind: this system is non-reversible. 
+%which is why this callibration is so important.
+%Without an accurate measurement of this system, 
+%experiment will be prone to wrong error corrections.
+
 function [cm, hm] = new_callibration()
 
 %This is the chosen arbitrary at target position for the beam to be at all
@@ -5,6 +32,7 @@ function [cm, hm] = new_callibration()
 pos_i_want = [646; 425; 646; 425];
 
 %This is an alignment function that does not show all diagnostics
+%Same as facet_align minus diagnostics 
 facet_control(pos_i_want, 0.25, .54/7);
 
 %data structures to hold output of measuremennt process.
