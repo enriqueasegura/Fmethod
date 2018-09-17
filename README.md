@@ -21,7 +21,9 @@ A Python library to get started with the nuts and bolts of EPICS:
 
 https://www.slac.stanford.edu/grp/ssrl/spear/epics/extensions/pyepics/pyepics.pdf
 
-MATLAB Programmer’s Guide for FACET physicists: https://portal.slac.stanford.edu/sites/ard_public/facet/faq/Documents/programming_guide_matlab_facet.pdf 
+MATLAB Programmer’s Guide for FACET physicists: 
+
+https://portal.slac.stanford.edu/sites/ard_public/facet/faq/Documents/programming_guide_matlab_facet.pdf 
 
 This controller was implemented using SLAC's code base to interact and control cameras and pico-motors present on the transport: 
 
