@@ -1,3 +1,10 @@
+%This function takes the input each of each camera
+%projects the image data, creates the distribution 
+%which is fitted on a gaussian distribution
+%to reduce the effects on noise in the image.
+%The resulting fitted max is the centroid's position
+%which is used to generate corrections for beam alignment.
+
 function [beamvec] = centroid_pixels(cam1, cam2)
 
 cam1_inty = zeros(1,(cam1.nRow));
