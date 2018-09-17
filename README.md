@@ -9,6 +9,8 @@ From that simulation results, we have built a two-mirror-two-camera system to te
 
 Here's the resulting code. This code is a PID-controller using that method - a 12x12 matrix for the final system, a 4x4 for this current system. 
 
+https://en.wikipedia.org/wiki/PID_controller#Integral_term
+
 This controller was implemented using SLAC's code base http://www.slac.stanford.edu/grp/lcls/controls/systems/xray_transport/EPICS%20Manuals/Motor%20Record.pdf to interact and control cameras and pico-motors present on the transport.
 
 A more complete documentation can be found here: 
@@ -21,6 +23,10 @@ Currently working on:
 2. Improving code's efficiency with respect to noise present in experiment. 
 3. Adding safeguards to enhance the robustness of the algorithm. 
 4. Implementing this algorithm on the FACET-II beamline to test its effectiveness on the intended experimental setup.
+
+Still on the list before end of fellowship: 
+
+Working on developing a machine learning technique to test auto-tuning features on Fmethod.
 
 For Simulations, we relied on ZEMAX's python API libraries, and MATLAB to design, implement, and optimize the controller. 
 
