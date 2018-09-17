@@ -4,7 +4,7 @@ This is a beam stabilization algorithm implemented to mitigate the effects of sl
 
 https://facet.slac.stanford.edu
 
-We have accomplished this by simulating the FACET-II beamline using ZEMAX, https://en.wikipedia.org/wiki/Zemax, testing a first-principle model of laser transport implemented using Lasers by Siegman as well as numerous research papers on Ray Tracing Optics.
+We have accomplished this by simulating the FACET-II beamline using ZEMAX, https://en.wikipedia.org/wiki/Zemax, testing a first-principle model of laser transport implemented using Lasers by Siegman as well as numerous research papers on Ray Tracing Optics (see https://link.springer.com/article/10.1007/BF00619988, https://www.osapublishing.org/josaa/abstract.cfm?uri=josaa-11-10-2633)
 
 https://www.osapublishing.org/books/bookshelf/lasers.cfm. 
 
@@ -16,7 +16,7 @@ An introduction to the fundamentals of a PID controller:
 
 https://en.wikipedia.org/wiki/PID_controller#Integral_term
 
-# A more complete documentation can be found here: 
+# More documentation can be found here: 
 
 The bread and butter of experimental physics software at SLAC: https://en.wikipedia.org/wiki/EPICS
 A Python library to get started with the nuts and bolts of EPICS: 
