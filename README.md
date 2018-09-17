@@ -4,7 +4,7 @@ This is a beam stabilization algorithm implemented to mitigate the effects of sl
 
 https://facet.slac.stanford.edu
 
-We have accomplished this by simulating the FACET-II beamline using ZEMAX, https://en.wikipedia.org/wiki/Zemax, testing a first-principle model of laser transport using Lasers by Siegman.
+We have accomplished this by simulating the FACET-II beamline using ZEMAX, https://en.wikipedia.org/wiki/Zemax, testing a first-principle model of laser transport implemented using Lasers by Siegman as well as numerous research papers on Ray Tracing Optics.
 
 https://www.osapublishing.org/books/bookshelf/lasers.cfm. 
 
