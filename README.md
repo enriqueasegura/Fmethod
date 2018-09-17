@@ -4,13 +4,16 @@ This is a beam stabilization algorithm implemented to mitigate the effects of sl
 
 https://facet.slac.stanford.edu
 
-We have accomplished this by simulating the FACET-II beamline using ZEMAX, https://en.wikipedia.org/wiki/Zemax, testing a first-principle model of laser transport implemented using Lasers by Siegman as well as numerous research papers on Ray Tracing Optics (see https://link.springer.com/article/10.1007/BF00619988, https://www.osapublishing.org/josaa/abstract.cfm?uri=josaa-11-10-2633)
+We have accomplished this by simulating the FACET-II beamline using ZEMAX, https://en.wikipedia.org/wiki/Zemax, testing a first-principle model of laser transport implemented using Lasers by Siegman as well as numerous research papers on Ray Tracing Optics:
 
-https://www.osapublishing.org/books/bookshelf/lasers.cfm. 
+https://www.osapublishing.org/books/bookshelf/lasers.cfm
 
-For Simulations, we relied on ZEMAX's python API libraries, and MATLAB to design, implement, and optimize the controller. 
+https://link.springer.com/article/10.1007/BF00619988
 
-From the simulation results, we have built a two-mirror-two-camera system to test the effectiveness of this method. Here's the resulting code. This code is a PID-controller using that method - a 12x12 matrix for the final system, a 4x4 for this current system. 
+https://www.osapublishing.org/josaa/abstract.cfm?uri=josaa-11-10-2633)
+
+
+For Simulations, we rely ZEMAX's python API libraries, and MATLAB to design, implement, and optimize the controller. From these results, we have built a two-mirror-two-camera system to test the effectiveness of this method against experimental data.  In order to this, a PID-controller was implemented.
 
 An introduction to the fundamentals of a PID controller: 
 
