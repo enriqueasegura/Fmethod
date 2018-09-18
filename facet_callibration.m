@@ -94,7 +94,10 @@ for engine=1:4
         lcaPutSmart(strcat(motor_str,'.TWV'),-10)%
         lcaPutSmart(strcat(motor_str,'.TWF'),-10)
         disp('warm up run!!')  
-        
+        %This function checks whether the beam is current moving
+        %in which it will return the value '2'. 
+        %Until it stops moving, we will keep checking for this value.
+        %See more on documentation regarding pico-motors software return values. 
         motor_status = lcaGetSmart(strcat(motor_str,'.MSTA'));
         
         %This is a loop that checks whether the motor is still moving using
