@@ -42,7 +42,7 @@ http://www.slac.stanford.edu/grp/lcls/controls/systems/xray_transport/
 3. Adding safeguards to enhance the robustness of the algorithm. 
 4. Implementing this algorithm on the FACET-II beamline to test its effectiveness on the intended experimental setup.
 
-#Still on the list before end of fellowship: 
+# Still on the list before end of fellowship: 
 
 The current system experiences severe coupling issues. Currently working on adding decoupling capabilities to the algorithm. It still aligns and keeps the beam on a given target position but it does so by following a parabolic trajectory rather than a linear trajectory.
 
