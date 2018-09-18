@@ -3,7 +3,7 @@
 %the appropiate corrections to effectively move
 %a misaligned beam to its target position. 
 %The system we are working on rely on pico-motors which
-%are prone tho latch back (hysteresis). 
+%are prone to latch back (hysteresis). 
 %Thus, we measured this matrix by deliberating target the center
 %More about hysteresis can be found here:
 %https://en.wikipedia.org/wiki/Hysteresis
