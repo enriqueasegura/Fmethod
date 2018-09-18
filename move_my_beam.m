@@ -8,68 +8,26 @@
 %see manual on README
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%A snappier version of move_my_beam 
+%This function controls the beam and enacts the appropiate corrections
+%to each engine
 
-function move_my_beam(rev_arr)
-
-lcaPutSmart('MOTR:B244:MC01:M0:CH1:MOTOR.TWV', rev_arr(1,1));
-lcaPutSmart('MOTR:B244:MC01:M0:CH1:MOTOR.TWF', 1.0);
-
-motor_stat_1x = lcaGetSmart('MOTR:B244:MC01:M0:CH1:MOTOR.MSTA');
-
-%this loop will inquire about the motor status until it finishes
-%then it breaks out and carries out the rest of the corrections.
-while((motor_stat_1x ~= 2))
-    motor_stat_1x = lcaGetSmart('MOTR:B244:MC01:M0:CH1:MOTOR.MSTA');
+function move_my_beam(fcorr_vec)
+for motor=1:4
+    motor_str = strcat('MOTR:B244:MC01:M0:CH',int2str(motor),':MOTOR');
+    %execute the motion
+    % 
+    lcaPutSmart(strcat(motor_str,'.TWV'), fcorr_vec(motor,1));
+    lcaPutSmart(strcat(motor_str,'.TWF'), 1.0);
+    
+    %check if the motor is moving
+    %this loop will inquire about the motor status until it finishes
+	%then it breaks out and carries out the rest of the corrections.
+    motor_status = lcaGetSmart(strcat(motor_str,'.MSTA'));
+    while((motor_status ~= 2))
+        motor_status= lcaGetSmart(strcat(motor_str,'.MSTA'));
+    end
 end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%next engine
-
-lcaPutSmart('MOTR:B244:MC01:M0:CH2:MOTOR.TWV', rev_arr(2,1));
-lcaPutSmart('MOTR:B244:MC01:M0:CH2:MOTOR.TWF', 1.0);
-
-motor_stat_1y = lcaGetSmart('MOTR:B244:MC01:M0:CH2:MOTOR.MSTA');
-
-%this loop will inquire about the motor status until it finishes
-%then it breaks out and carries out the rest of the corrections.
-while((motor_stat_1y ~= 2))
-    motor_stat_1y = lcaGetSmart('MOTR:B244:MC01:M0:CH2:MOTOR.MSTA');
 end
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%next engine
-lcaPutSmart('MOTR:B244:MC01:M0:CH3:MOTOR.TWV', rev_arr(3,1));
-lcaPutSmart('MOTR:B244:MC01:M0:CH3:MOTOR.TWF', 1.0)
 
-motor_stat_2x = lcaGetSmart('MOTR:B244:MC01:M0:CH3:MOTOR.MSTA');
-
-
-%this loop will inquire about the motor status until it finishes
-%then it breaks out and carries out the rest of the corrections.
-while((motor_stat_2x  ~= 2))
-    motor_stat_2x = lcaGetSmart('MOTR:B244:MC01:M0:CH3:MOTOR.MSTA');
-end
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%next engine
-
-lcaPutSmart('MOTR:B244:MC01:M0:CH4:MOTOR.TWV', rev_arr(4,1));
-lcaPutSmart('MOTR:B244:MC01:M0:CH4:MOTOR.TWF', 1.0)
-
-motor_stat_2y = lcaGetSmart('MOTR:B244:MC01:M0:CH4:MOTOR.MSTA');
-
-%this loop will inquire about the motor status until it finishes
-%then it breaks out and carries out the rest of the corrections.
-while((motor_stat_2y ~= 2))
-    motor_stat_2y = lcaGetSmart('MOTR:B244:MC01:M0:CH4:MOTOR.MSTA');
-end
-
-end
