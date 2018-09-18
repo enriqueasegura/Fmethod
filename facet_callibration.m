@@ -25,6 +25,11 @@
 %Without an accurate measurement of this system, 
 %experiment will be prone to wrong error corrections.
 
+%variable_distance: a given step size (revolution) to each engine
+%to extract the pixel difference per revolution.
+%This was done to determine whether latchback was dependant on stepsize. 
+%It was not.
+
 function [cm, hm] = facet_callibration(variable_distance)
 
 %This is the chosen arbitrary at target position for the beam to be at all
