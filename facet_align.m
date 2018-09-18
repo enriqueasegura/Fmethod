@@ -1,29 +1,10 @@
-%This is a PID-controller implemented to control the FACET-II Ti:Saph beam under the effects of slow drift.
-% facet_align(target, kp, ki, k_d, k_u, it_fterm)
-% Arguments:
-% target: the desired position for the beam across all cameras. 
-% kp: the proportional tuning variable.
-% ki: the integration tuning variable.
-% kd: the derivative tuning variable.
-% k_u : maximum gain to the controller. 
-% it_fterm: final iteration number (MAX).
-% Basics of PID can be found here: https://en.wikipedia.org/wiki/PID_controller#Integral_term
-
-
-
-
 function [variables, track_data, pv_data, corr_data, int_data, total_rev, int_diff, time_arr, aligntime]=facet_align(target, kp, ki, k_d, k_u, it_fterm)
-
 disp('kp, ki, kd, ku:')
-
-%Adjusting tuning parameters by max gain
 ki = ki*k_u;
 kp= kp*k_u;
 kd = k_d*k_u
-
 %storing the PID parameters
 variables = [kp,ki, k_d, k_u];
-
 disp('PID Tuning Parameters')
 disp(variables);
 
@@ -56,29 +37,19 @@ status = 'not done';
 aligntime(i) = 0;
 while isequal(status, 'not done')
     
-    %for more information on profmon_grab, please see this:
-    %https://portal.slac.stanford.edu/sites/ard_public/facet/faq/Documents/Profmon_GUI_help.pdf
-    %Basically, this function will extract the image array from the CCD
-    %then we feed this to centroid_pixels which will return the fitted values for the (x,y) coordinate of the beam
-    %in the camera.
-    
     cam2_c = profmon_grab('EXPT:LI20:3309');
     cam1_c = profmon_grab('EXPT:LI20:3310');
-    %current beam position:
     beam_vec = centroid_pixels(cam1_c,cam2_c);
-    
     it_arr(i) =i;
     track_data(:,i) = beam_vec';
     
     
     err = transpose(beam_vec) - target;
     
+    % diff = target - transpose(beam_vec);
+    
     pv_data(:,i) = err;
-    
-    %extract raw corrections using matrix inversion on rev_move
     corr= rev_move(err);
-    
-    %plotting colors
     c_track1x ='-.rs';
     c_track1y = ':b^';
     c_pv1x =  '-.gd';
@@ -92,9 +63,6 @@ while isequal(status, 'not done')
     abs_diffy(i) = abs(curr_pos(2,1) - curr_pos(4,1));
 
     %plots to serve as diagnostic updates as the F-method runs
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     figure(19)
     subplot(2,3,1)
     plot(track_data(1,1:i), track_data(2,1:i), ':ro')
@@ -220,11 +188,6 @@ while isequal(status, 'not done')
     set(gcf, 'Color', 'w')
     
     drawnow;
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
-    %keep tally of errors for integration and derivative considerations
     
     if isequal(i,1)
         %this keeps track of all the errors
@@ -233,7 +196,7 @@ while isequal(status, 'not done')
         int_diff(:, i) =err;
         derivative(:,i) = err;
     else
-        int_diff(:,i) = int_diff(:,i)+err;
+        int_diff(:,i) = int_diff(:,i-1)+err;
         %in case of PID 
         derivative(:,i) = err - derivative(:,end);
     end
@@ -241,24 +204,18 @@ while isequal(status, 'not done')
     %calculate necessary adjustments due to Integral and Derivative Components
     int_rev = rev_move(int_diff(:,i));
     derivative_corr(:,i) = rev_move(derivative(:,i));
-    
-    %Adjusted by Tuning Parameters (User input)
-    corr_data(:,i) = kp*corr;
-    int_data(:,i) = ki*int_rev;
+	
+	%Adjusted by Tuning Parameters (User input)
+	corr_data(:,i) = kp*corr;
+	int_data(:,i) = ki*int_rev;
     derv_data(:,i) = kd*derivative_corr(:,i);
     
     %Calculate Total Correction
-    %From PID fundamentals:
-    %total corrections = proportional response + integral corrections + derivative corrections
-    
     total_rev(:,i)= kp*corr+ ki*int_rev + (kd)*derivative_rev;
     disp('final rev:')
     disp(total_rev(:,i)');
     
     %Diagnostics Display of Real Time Corrections 
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     figure(065)
     subplot(221)
@@ -303,9 +260,6 @@ while isequal(status, 'not done')
     set(gcf, 'Color', 'w')
         
     drawnow
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     %time the corrections 
     
