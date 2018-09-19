@@ -204,10 +204,10 @@ while isequal(status, 'not done')
     %calculate necessary adjustments due to Integral and Derivative Components
     int_rev = rev_move(int_diff(:,i));
     derivative_corr(:,i) = rev_move(derivative(:,i));
-	
-	%Adjusted by Tuning Parameters (User input)
-	corr_data(:,i) = kp*corr;
-	int_data(:,i) = ki*int_rev;
+
+    %Adjusted by Tuning Parameters (User input)
+    corr_data(:,i) = kp*corr;
+    int_data(:,i) = ki*int_rev;
     derv_data(:,i) = kd*derivative_corr(:,i);
     
     %Calculate Total Correction

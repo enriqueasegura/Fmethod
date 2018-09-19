@@ -3,7 +3,7 @@
 %the appropiate corrections to effectively move
 %a misaligned beam to its target position. 
 %The system we are working on rely on pico-motors which
-%are prone tho latch back (hysteresis). 
+%are prone to latch back (hysteresis). 
 %Thus, we measured this matrix by deliberating target the center
 %More about hysteresis can be found here:
 %https://en.wikipedia.org/wiki/Hysteresis
@@ -94,7 +94,10 @@ for engine=1:4
         lcaPutSmart(strcat(motor_str,'.TWV'),-10)%
         lcaPutSmart(strcat(motor_str,'.TWF'),-10)
         disp('warm up run!!')  
-        
+        %This function checks whether the beam is current moving
+        %in which it will return the value '2'. 
+        %Until it stops moving, we will keep checking for this value.
+        %See more on documentation regarding pico-motors software return values. 
         motor_status = lcaGetSmart(strcat(motor_str,'.MSTA'));
         
         %This is a loop that checks whether the motor is still moving using
