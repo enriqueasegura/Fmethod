@@ -1,3 +1,5 @@
+
+
 function [rev_arr] = rev_move(target_vec)
 
 %measured by callibration matrix
@@ -13,7 +15,13 @@ cammat = [
 ];
 
 %Callibration matrix was measured in 10 revolutions. 
-cammat=(cammat/10);
+
+
+cammat = cammat / 10;
+cammat = cammat';
+
+
+rev_arr = cammat \ target_vec;
 
 %Extract inverse from target_vec
 %target_vec is the err calculated in Fmethod algorithm.
