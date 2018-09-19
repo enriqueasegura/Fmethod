@@ -301,7 +301,7 @@ while isequal(status, 'not done')
     aligntime(i) = sum(time_arr(1:i)/60);
     
     %in case of longer than 20 minutes run, stop feedback.  
-    if curr_total_runtime > 20
+    if curr_total_runtime > 20 || i >= it_fterm
         disp('total time run:')
         disp(curr_total_runtime(:,i));
         status = 'done';
