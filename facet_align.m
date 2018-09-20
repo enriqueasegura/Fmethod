@@ -1,68 +1,142 @@
-function [variables, track_data, pv_data, corr_data, int_data, total_rev, int_diff, time_arr, aligntime]=facet_align(target, kp, ki, k_d, k_u, it_fterm)
-disp('kp, ki, kd, ku:')
+function [variables, track_data, pv_data, corr_data, int_data, total_rev, int_diff, time_arr, aligntime, callibration_memory ]=facet_align(target, kp, ki, kd, k_u, answer, long_scale_flag)
+disp('kp, ki, ku:')
 ki = ki*k_u;
 kp= kp*k_u;
-kd = k_d*k_u
-%storing the PID parameters
-variables = [kp,ki, k_d, k_u];
-disp('PID Tuning Parameters')
+kd = kd*k_u;
+variables = [kp,ki, k_u];
 disp(variables);
-
-%it_fterm are the max iterations allowed
-
+it_fterm = 400;
 track_data = zeros(4,it_fterm);
 pv_data= zeros(4,it_fterm);
-
 corr_data = zeros(4,it_fterm);
 int_data = zeros(4,it_fterm);
-
 total_rev = zeros(4,it_fterm);
+aligntime= zeros(1, it_fterm);
 
-aligntime= zeros(1,it_fterm);
-int_diff = zeros(4,it_fterm);
+int_diff = zeros(4,400);
 
-abs_diffx=zeros(1,it_fterm);
-abs_diffy=zeros(1,it_fterm);
+abs_diffx=zeros(1,400);
+abs_diffy=zeros(1,400);
 
-derivative = zeros(4,it_fterm);
-derivative_corr = zeros(4,it_fterm);
-derv_data =  zeros(4,it_fterm);
+derivative = zeros(4,400);
+delta_corr = zeros(4,400);
 
-time_arr = zeros(1,it_fterm);
-it_arr = zeros(1,it_fterm);
-
-%dummy variable to track iterations of the algorithm
+time_arr = zeros(1,400);
+it_arr = zeros(1,400);
 i = 1;
+curr_total_runtime = zeros(1,400);
+callibration_memory = zeros(it_fterm, 4,4);
+on_the_fly_memory = zeros(it_fterm, 4,4);
+
 status = 'not done';
-aligntime(i) = 0;
+
+
 while isequal(status, 'not done')
-    
+
+    % Grab the beam position on each camera
     cam2_c = profmon_grab('EXPT:LI20:3309');
     cam1_c = profmon_grab('EXPT:LI20:3310');
-    beam_vec = centroid_pixels(cam1_c,cam2_c);
+    beam_vec = centroid_pixels(cam1_c, cam2_c);
+    % Record the iteration number
     it_arr(i) =i;
+    % Record the current beam position
     track_data(:,i) = beam_vec';
+    disp('Current Position')
+    disp(beam_vec);
     
-    
-    err = transpose(beam_vec) - target;
-    
-    % diff = target - transpose(beam_vec);
-    
+    % Calculate the error: current position - desired position
+%     err = target - transpose(beam_vec);
+    err = target - check_pos;
+    %err = (transpose(beam_vec) - target);
+%     flipper = 1.0*[ 1.00, 0, 0, 0; ... %originally -1 in first two rows
+%                 0, 1.00, 0, 0;...
+%                 0, 0, 1.00 0;...
+%                 0, 0, 0, 1.00];
+%     err = flipper * err;
+    % Record the error  
     pv_data(:,i) = err;
-    corr= rev_move(err);
+    % Calculate the proportional corrections
+    corr = rev_move(err);
+
+    % Keep track of the integral of the errors
+    if i>=2
+        int_diff(:,i) = int_diff(:,i-1) + err;
+        %in case of PID 
+        derivative(:,i) = err - derivative(:,i-1);
+    end
+    
+    int_rev = rev_move( int_diff(:,i) );
+    delta_rev = rev_move(derivative(:,i));
+    % Record the proportional correction and the integral correction
+    corr_data(:,i) = kp*corr;
+    int_data(:,i) = ki*int_rev;
+    delta_corr(:,i) = kd*delta_rev;
+    current_total_rev = kp*corr+ ki*int_rev + (kd)*delta_rev;
+    
+    if abs(total_rev(1,1)) >= 10 || abs(total_rev(2,1)) >= 10 || abs(total_rev(3,1)) >= 10 || abs(total_rev(4,1)) >= 10
+        disp('This correction might be push the beam off the mirror')
+        disp('Stopping Algorithm')
+        break;
+    end
+    
+    total_rev(:,i) = current_total_rev;
+    
+    
+    disp('final rev:')
+    disp(total_rev(:,i)');
+    
+    %time the corrections
+    time_rev_start = tic;
+    %execute the corrections
+    callibration_memory(i,:,:)  = move_my_beam(total_rev(:,i));
+    t_rev_elapsed = toc(time_rev_start);
+    time_arr(i) = (t_rev_elapsed);
+    disp('Time elapsed:')
+    disp((t_rev_elapsed));
+    
+    %use on the fly callibration
+    if i > 1
+        change_in_beam_pos = track_data(:,i) - track_data(:,i-1);
+        on_the_fly_memory(i,:,:)= on_the_fly_response(change_in_beam_pos, total_rev(:,i-1));
+    end
+    % Only plots below here.
+    
+        
     c_track1x ='-.rs';
     c_track1y = ':b^';
     c_pv1x =  '-.gd';
     c_pv1y =  ':ro';
-    
-    %tracking current difference to estimate alignment
-    %respect to each dimension
-    
     curr_pos = track_data(:,i);
     abs_diffx(i) = abs(curr_pos(1,1) - curr_pos(3,1));
     abs_diffy(i) = abs(curr_pos(2,1) - curr_pos(4,1));
 
-    %plots to serve as diagnostic updates as the F-method runs
+    figure(3)
+    plot(it_arr(1:i), abs_diffx(1:i), ':r^', it_arr(1:i), abs_diffy(1:i), ':cs')
+    xlabel('F method Iterations num')
+    ylabel('abs(\Delta) )(pix)')
+    set(gcf, 'Position' , [600,200,400,400])
+    set(gcf, 'Color', 'w')
+    title('Relative Alignment on Both Dimensions', 'Fontsize', 25)
+    
+    drawnow
+    
+    figure(4)
+    subplot(121)
+    plot(it_arr(1:i), track_data(1,1:i), '-.mo',it_arr(1:i), track_data(3,1:i), '-.co',it_arr(1:i),abs_diffx(1:i), ':r^')
+    xlabel('F method Iterations num')
+    ylabel('Beam X (pix)')
+    title('Relative Alignment on X', 'Fontsize', 25)
+    
+    subplot(122)
+    plot(it_arr(1:i), track_data(2,1:i), '-.mo',it_arr(1:i), track_data(4,1:i), '-.co', it_arr(1:i),abs_diffy(1:i), ':r^')
+    xlabel('F method Iterations num')
+    ylabel('Beam Y (pix)')
+    set(gcf, 'Position' , [600,200,300,300])
+    set(gcf, 'Color', 'w')
+    title('Relative Alignment on Y', 'Fontsize', 25)
+
+    drawnow   
+    
     figure(19)
     subplot(2,3,1)
     plot(track_data(1,1:i), track_data(2,1:i), ':ro')
@@ -98,39 +172,12 @@ while isequal(status, 'not done')
     set(gcf, 'Position' , [800,900,800,400])
     set(gcf, 'Color', 'w')
     drawnow
-
-    figure(3)
-    plot(it_arr(1:i), abs_diffx(1:i), ':r^', it_arr(1:i), abs_diffy(1:i), ':cs')
-    xlabel('F method Iterations num')
-    ylabel('abs(\Delta) )(pix)')
-    set(gcf, 'Position' , [600,200,400,400])
-    set(gcf, 'Color', 'w')
-    title('Relative Alignment on Both Dimensions', 'Fontsize', 25)
-    
-    drawnow
-    
-    figure(4)
-    subplot(121)
-    plot(it_arr(1:i), track_data(1,1:i), '-.mo',it_arr(1:i), track_data(3,1:i), '-.co',it_arr(1:i),abs_diffx(1:i), ':r^')
-    xlabel('F method Iterations num')
-    ylabel('Beam X (pix)')
-    title('Relative Alignment on X', 'Fontsize', 25)
-    
-    subplot(122)
-    plot(it_arr(1:i), track_data(2,1:i), '-.mo',it_arr(1:i), track_data(4,1:i), '-.co', it_arr(1:i),abs_diffy(1:i), ':r^')
-    xlabel('F method Iterations num')
-    ylabel('Beam Y (pix)')
-    set(gcf, 'Position' , [600,200,300,300])
-    set(gcf, 'Color', 'w')
-    title('Relative Alignment on Y', 'Fontsize', 25)
-
-    drawnow
     
     figure(735)
     subplot(2,2,1)
     plot(it_arr(1:i), track_data(1,1:i), c_track1x)
     title('Beam 1X-Coordinate')
-    xlabel('F method iteration (sec)', 'Fontsize',10)
+    xlabel('F method iteration', 'Fontsize',10)
     ylabel('Beam Position (pix)', 'Fontsize', 10)
     set(gcf, 'Color', 'w')
     
@@ -138,7 +185,7 @@ while isequal(status, 'not done')
     subplot(2,2,2)
     plot(it_arr(1:i), track_data(2,1:i), c_track1y)
     title('Beam 1Y-Coordinate')
-    xlabel('F method iteration (sec)', 'Fontsize',10)
+    xlabel('F method iteration', 'Fontsize',10)
     ylabel('Beam Position (pix)', 'Fontsize', 10)
     set(gcf, 'Color', 'w')
     
@@ -146,14 +193,14 @@ while isequal(status, 'not done')
     subplot(2,2,3)
     plot(it_arr(1:i), track_data(3,1:i), c_track1x)
     title('Beam 2X-Coordinate')
-    xlabel('F method iteration (sec)', 'Fontsize',10)
+    xlabel('F method iteration', 'Fontsize',10)
     ylabel('Beam Position (pix)', 'Fontsize', 10)
     set(gcf, 'Color', 'w')
     
     subplot(2,2,4)
     plot(it_arr(1:i), track_data(4,1:i), c_track1y)
     title('Beam 2Y-Coordinate')
-    xlabel('F method iteration (sec)', 'Fontsize',10)
+    xlabel('F method iteration', 'Fontsize',10)
     ylabel('Beam Position (pix)', 'Fontsize', 10)
     set(gcf, 'Position' , [600,200,400,300])
     set(gcf, 'Color', 'w')
@@ -164,58 +211,30 @@ while isequal(status, 'not done')
     plot(it_arr(1:i), pv_data(1, 1:i), c_pv1x)
     title('Beam 1X-Coordinate')
     xlabel('F method iteration num', 'Fontsize',10)
-    ylabel('\Delta (pix)', 'Fontsize', 10)
+    ylabel('\Delta (pix)', 'Fontsize', 15)
     set(gcf, 'Color', 'w')
     
     subplot(2,2,2)
     plot(it_arr(1:i), pv_data(2, 1:i), c_pv1y)
     title('Beam 1Y-Coordinate')
     xlabel('F method iteration num', 'Fontsize',10)
-    ylabel('\Delta (pix)', 'Fontsize', 10)
+    ylabel('\Delta (pix)', 'Fontsize', 15)
     
     subplot(2,2,3)
     plot(it_arr(1:i), pv_data(3, 1:i), c_pv1x)
     title('Beam 2X-Coordinate')
     xlabel('F method iteration num', 'Fontsize',10)
-    ylabel('\Delta (pix)', 'Fontsize', 10)
+    ylabel('\Delta (pix)', 'Fontsize', 15)
     
     subplot(2,2,4)
     plot(it_arr(1:i),pv_data(4, 1:i),c_pv1y)
     title('Beam 2Y-Coordinate')
     xlabel('F method iteration num', 'Fontsize',10)
-    ylabel('\Delta (pix)', 'Fontsize', 10)
+    ylabel('\Delta (pix)', 'Fontsize', 15)
     set(gcf, 'Position' , [200,200,400,300])
     set(gcf, 'Color', 'w')
     
     drawnow;
-    
-    if isequal(i,1)
-        %this keeps track of all the errors
-        %and will be used to calculate integral corrections
-        %to adjust
-        int_diff(:, i) =err;
-        derivative(:,i) = err;
-    else
-        int_diff(:,i) = int_diff(:,i-1)+err;
-        %in case of PID 
-        derivative(:,i) = err - derivative(:,end);
-    end
-    
-    %calculate necessary adjustments due to Integral and Derivative Components
-    int_rev = rev_move(int_diff(:,i));
-    derivative_corr(:,i) = rev_move(derivative(:,i));
-
-    %Adjusted by Tuning Parameters (User input)
-    corr_data(:,i) = kp*corr;
-    int_data(:,i) = ki*int_rev;
-    derv_data(:,i) = kd*derivative_corr(:,i);
-    
-    %Calculate Total Correction
-    total_rev(:,i)= kp*corr+ ki*int_rev + (kd)*derivative_rev;
-    disp('final rev:')
-    disp(total_rev(:,i)');
-    
-    %Diagnostics Display of Real Time Corrections 
     
     figure(065)
     subplot(221)
@@ -247,12 +266,14 @@ while isequal(status, 'not done')
     
     figure(218)
     subplot(121)
+    plot(target(1), target(2), 'bx', 'MarkerSize', 20)
     quiver(track_data(1,1:i), track_data(2,1:i), total_rev(1,1:i), total_rev(2,1:i), '-r')
     xlabel('Beam 1X (pix)')
     ylabel('Beam 1Y (pix)')
     title('Mirror 1')
     subplot(122)
-    quiver(track_data(3,1:i), track_data(4,1:i), total_rev(3,1:i), total_rev(4,1:i), '-.b')
+    plot(target(3), target(4), 'bx', 'MarkerSize', 20)
+    quiver(track_data(3,1:i), track_data(4,1:i), total_rev(3,1:i), total_rev(4,1:i), '-b')
     xlabel('Beam 2X (pix)')
     ylabel('Beam 2Y (pix)')
     title('Mirror 2')
@@ -260,48 +281,27 @@ while isequal(status, 'not done')
     set(gcf, 'Color', 'w')
         
     drawnow
+
     
-    %time the corrections 
-    
-    time_rev_start = tic;
-    
-    %execute the corrections
-    %This function sends corrections to pico-motors to execute the motions
-    %to rectify the beam.
-    move_my_beam(total_rev(:,i));
-    
-    t_rev_elapsed = toc(time_rev_start);
-    
-    %Feed timestamp of each correction's time
-    %This will be used to assert any correlation between initial corrections, 
-    %time spent on each correction, and results on error minimization. 
-    %Goal: to improve using this data time of oscillation parameter to obtain better
-    %tuning for controller. 
-    
-    time_arr(i) = (t_rev_elapsed);
-    
-    disp('Time elapsed:')
-    disp((t_rev_elapsed));
-    
-    %Check for halting condition (currently at 1 pix, but expected to reach 0.5 pix)
+    %check distance (very basic proportional control).
     if abs(err(1,1)) < 1 && abs(err(2,1))  < 1 && abs(err(3,1))  < 1 && abs(err(4,1))  < 1
         disp('it aligned')
-        disp(beam_vec')
+        disp(beam_vec)
         disp('it num:')
         disp(i);
         aligntime(i) = i;
         disp('Time to align (min)')
         disp(sum(time_arr(1:i)/60))
-        status = 'done';
-        disp(aligntime(:,i));
+        if isequal(long_scale_flag, 'no')
+            status = 'done';
+            disp(aligntime(:,i));
+        end
     end
-    %convert to minutes and store timestamp
-    
     curr_total_runtime = sum(time_arr(1:i)/60);
     aligntime(i) = sum(time_arr(1:i)/60);
     
-    %in case of longer than 20 minutes run, stop feedback.  
-    if curr_total_runtime > 20
+    %in case of longer than 20 minutes run, stop feedback. 
+    if i >= it_fterm && isequal(long_scale_flag, 'yes')
         disp('total time run:')
         disp(curr_total_runtime(:,i));
         status = 'done';
@@ -311,14 +311,11 @@ while isequal(status, 'not done')
     
 end
 
-disp('Algo Finished. Beam Aligned to Target Position')
-
-prompt = 'Would you like to save this experimental data?';
-answer = input(prompt, 's');
+disp('algo finished')
 
 if isequal(answer, 'Yes') || isequal(answer, 'yes')
 
-    disp('Saving Data!')
+    disp('saving data!')
     
     diffx_name = ['/u1/facet/matlab/data/2018/data_facet_align/diffx_data', datestr(now, 'mm-dd-yy HH-MM-SS'), '.csv'];
     csvwrite(diffx_name, abs_diffx);
@@ -345,6 +342,13 @@ if isequal(answer, 'Yes') || isequal(answer, 'yes')
     
     aligntime_stamp =['/u1/facet/matlab/data/2018/data_facet_align/aligntimecorrdata', datestr(now, 'mm-dd-yy HH-MM-SS'), '.csv'];
     csvwrite(aligntime_stamp, aligntime);
-end
-
+    
+    calimemory_stamp =['/u1/facet/matlab/data/2018/data_facet_align/calimemory', datestr(now, 'mm-dd-yy HH-MM-SS'), '.csv'];
+    csvwrite(calimemory_stamp, callibration_memory);
+    
+    on_the_fly_calimemory_stamp =['/u1/facet/matlab/data/2018/data_facet_align/onthefly_calimemory', datestr(now, 'mm-dd-yy HH-MM-SS'), '.csv'];
+    csvwrite(on_the_fly_calimemory_stamp, on_the_fly_memory);
+    
+    
+    
 end
