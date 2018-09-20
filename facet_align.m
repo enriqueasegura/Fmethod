@@ -45,8 +45,8 @@ while isequal(status, 'not done')
     disp(beam_vec);
     
     % Calculate the error: current position - desired position
-%     err = target - transpose(beam_vec);
-    err = target - check_pos;
+    err = target - transpose(beam_vec);
+    %err = target - check_pos;
     %err = (transpose(beam_vec) - target);
 %     flipper = 1.0*[ 1.00, 0, 0, 0; ... %originally -1 in first two rows
 %                 0, 1.00, 0, 0;...
