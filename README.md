@@ -10,7 +10,9 @@ https://www.osapublishing.org/books/bookshelf/lasers.cfm
 
 https://link.springer.com/article/10.1007/BF00619988
 
-https://www.osapublishing.org/josaa/abstract.cfm?uri=josaa-11-10-2633)
+https://www.osapublishing.org/josaa/abstract.cfm?uri=josaa-11-10-2633
+
+https://www.osapublishing.org/view_article.cfm?gotourl=https%3A%2F%2Fwww%2Eosapublishing%2Eorg%2FDirectPDFAccess%2FE306B6B3%2DEBA9%2DA5B8%2D9165A8DF1E89651B%5F830%2Fjosaa%2D11%2D10%2D2633%2Epdf%3Fda%3D1%26id%3D830%26seq%3D0%26mobile%3Dno&org=Stanford%20University%20Libraries
 
 
 For Simulations, we rely ZEMAX's python API libraries, and MATLAB to design, implement, and optimize the controller. From these results, we have built a two-mirror-two-camera system to test the effectiveness of this method against experimental data.  In order to this, a PID-controller was implemented.
