@@ -46,8 +46,9 @@ http://www.slac.stanford.edu/grp/lcls/controls/systems/xray_transport/
 
 # Still on the list before end of fellowship: 
 
-The current system experiences severe coupling issues. Currently working on adding decoupling capabilities to the algorithm. It still aligns and keeps the beam on a given target position but it does so by following a parabolic trajectory rather than a linear trajectory.
+1. The current system experiences severe coupling issues. Currently working on adding decoupling capabilities to the algorithm. 
 
+2. Work on adding a encoder to obtain better tuning parameters. 
 
 
 
