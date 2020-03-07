@@ -37,18 +37,6 @@ This controller was implemented using SLAC's code base to interact and control c
 http://www.slac.stanford.edu/grp/lcls/controls/systems/xray_transport/EPICS%20Manuals/Motor%20Record.pdf
 http://www.slac.stanford.edu/grp/lcls/controls/systems/xray_transport/
 
-# Currently working on: 
-
-1. Improving tuning parameters. 
-2. Improving code's efficiency with respect to noise present in experiment. 
-3. Adding safeguards to enhance the robustness of the algorithm. 
-4. Implementing this algorithm on the FACET-II beamline to test its effectiveness on the intended experimental setup.
-
-# Still on the list before end of fellowship: 
-
-1. The current system experiences severe coupling issues. Currently working on adding decoupling capabilities to the algorithm. 
-
-2. Work on adding a encoder to obtain better tuning parameters. 
 
 
 
